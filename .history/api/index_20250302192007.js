@@ -580,6 +580,8 @@ const tvServers = servers.map((server) => ({
       : `${server.url}/embed/tv/${id}/${season}/${episode || 1}`,
 }));
 
+export { servers, moviesServers, tvServers };
+
 export function useMovieLink() {
   const movieLink = ref(null);
 

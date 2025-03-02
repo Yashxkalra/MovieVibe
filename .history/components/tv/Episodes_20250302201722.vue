@@ -1,8 +1,6 @@
 <template>
   <div class="spacing">
     <div :class="$style.head">
-      <pre>{{ $props }}</pre>
-
       <select
         v-if="seasons.length > 1"
         v-model="activeSeason"
@@ -30,14 +28,6 @@
         @openModal="openModal"
       />
     </div>
-    <Modal
-      v-if="modalVisible"
-      :data="videos"
-      type="iframe"
-      nav
-      :start-at="modalStartAt"
-      @close="closeModal"
-    />
   </div>
 </template>
 
@@ -92,14 +82,7 @@ export default {
   },
 
   mounted() {
-    this.getEpisodes(); // Call the method normally
-
-    const data = async () => {
-      const result = await this.getEpisodes(); // `this` works correctly here
-      console.log("Props received:", result);
-    };
-
-    data(); // Call the async function
+    this.getEpisodes();
   },
 
   methods: {

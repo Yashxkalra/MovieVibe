@@ -92,14 +92,8 @@ export default {
   },
 
   mounted() {
-    this.getEpisodes(); // Call the method normally
-
-    const data = async () => {
-      const result = await this.getEpisodes(); // `this` works correctly here
-      console.log("Props received:", result);
-    };
-
-    data(); // Call the async function
+    this.getEpisodes();
+    console.log("Props received:", this.getEpisodes());
   },
 
   methods: {

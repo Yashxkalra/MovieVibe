@@ -1,8 +1,6 @@
 <template>
   <div class="spacing">
     <div :class="$style.head">
-      <pre>{{ $props }}</pre>
-
       <select
         v-if="seasons.length > 1"
         v-model="activeSeason"
@@ -27,29 +25,20 @@
         v-for="episode in activeEpisodes"
         :key="`episode-${episode.id}`"
         :episode="episode"
-        @openModal="openModal"
       />
     </div>
-    <Modal
-      v-if="modalVisible"
-      :data="videos"
-      type="iframe"
-      nav
-      :start-at="modalStartAt"
-      @close="closeModal"
-    />
   </div>
 </template>
 
 <script>
-import { getTvShowEpisodes } from "~/api";
+import { getTvShowEpisodes, SelectedServer } from "~/api";
 import EpisodesItem from "~/components/tv/EpisodesItem";
-import Modal from "~/components/Modal";
+
+const selectedServer = ref < SelectedServer > 0;
 
 export default {
   components: {
     EpisodesItem,
-    Modal,
   },
 
   props: {
@@ -63,8 +52,6 @@ export default {
     return {
       activeSeason: this.numberOfSeasons,
       activeEpisodes: null,
-      modalVisible: false,
-      modalStartAt: 0,
     };
   },
 
@@ -92,14 +79,7 @@ export default {
   },
 
   mounted() {
-    this.getEpisodes(); // Call the method normally
-
-    const data = async () => {
-      const result = await this.getEpisodes(); // `this` works correctly here
-      console.log("Props received:", result);
-    };
-
-    data(); // Call the async function
+    this.getEpisodes();
   },
 
   methods: {
@@ -121,15 +101,6 @@ export default {
           }
         );
       }
-    },
-    openModal(index) {
-      this.modalStartAt = index;
-      this.modalVisible = true;
-    },
-
-    closeModal() {
-      this.modalVisible = false;
-      this.modalStartAt = 0;
     },
   },
 };

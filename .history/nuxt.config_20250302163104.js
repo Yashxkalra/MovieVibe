@@ -31,7 +31,7 @@ export default {
       {
         hid: "og:url",
         property: "og:url",
-        content: "#",
+        content: "https://movies.jason.codes/",
       },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Movies" },
@@ -73,25 +73,7 @@ export default {
     // https://go.nuxtjs.dev/eslint
     "@nuxtjs/eslint-module",
   ],
-  configureWebpack: {
-    resolve: {
-      alias: {
-        "@": require("path").resolve(__dirname, "src"),
-      },
-    },
-  },
-  alias: {
-    "@": "/absolute/path/to/src",
-  },
-  build: {
-    webpack5: true,
-    hotMiddleware: {
-      client: {
-        // turn off client overlay when errors are present
-        overlay: false,
-      },
-    },
-  },
+
   modules: ["@nuxtjs/dotenv", "@nuxtjs/axios", "@nuxtjs/pwa"],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios

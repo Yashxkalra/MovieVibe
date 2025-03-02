@@ -3,10 +3,9 @@
     <button
       v-for="(item, index) in menu"
       :key="`tab-${index}`"
-      :class="[$style.button, { [$style.buttonActive]: active === index }]"
+      :class="[$style.button, { [$style.buttonActive] : active === index }]"
       type="button"
-      @click="clicked(index, item)"
-    >
+      @click="clicked(index, item)">
       {{ item }}
     </button>
   </div>
@@ -21,25 +20,23 @@ export default {
     },
   },
 
-  data() {
+  data () {
     return {
       active: 0,
     };
   },
-  mounted() {
-    console.log("Props received:", menu);
-  },
+
   methods: {
-    clicked(index, item) {
+    clicked (index, item) {
       this.active = index;
-      this.$emit("clicked", item.replace(/\s+/g, "-").toLowerCase());
+      this.$emit('clicked', item.replace(/\s+/g, '-').toLowerCase());
     },
   },
 };
 </script>
 
 <style lang="scss" module>
-@import "~/assets/css/utilities/_variables.scss";
+@import '~/assets/css/utilities/_variables.scss';
 
 .nav {
   display: flex;

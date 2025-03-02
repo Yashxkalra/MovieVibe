@@ -80,9 +80,6 @@ export default {
       },
     },
   },
-  alias: {
-    "@": "/absolute/path/to/src",
-  },
   build: {
     webpack5: true,
     hotMiddleware: {

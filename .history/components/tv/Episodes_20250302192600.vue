@@ -1,8 +1,6 @@
 <template>
   <div class="spacing">
     <div :class="$style.head">
-      <pre>{{ $props }}</pre>
-
       <select
         v-if="seasons.length > 1"
         v-model="activeSeason"
@@ -16,6 +14,23 @@
           Season {{ season.season }}
         </option>
       </select>
+      <select
+        v-model="selectedServer"
+        border-0
+        bg-inherit
+        text-lg
+        op50
+        mb-6
+        cursor-pointer
+      >
+        <option
+          v-for="(server, index) in servers"
+          :key="server.name"
+          :value="index"
+        >
+          {{ `server ${index + 1}` }}
+        </option>
+      </select>
 
       <strong v-if="activeEpisodes" :class="$style.count">
         {{ episodeCount }}
@@ -27,29 +42,18 @@
         v-for="episode in activeEpisodes"
         :key="`episode-${episode.id}`"
         :episode="episode"
-        @openModal="openModal"
       />
     </div>
-    <Modal
-      v-if="modalVisible"
-      :data="videos"
-      type="iframe"
-      nav
-      :start-at="modalStartAt"
-      @close="closeModal"
-    />
   </div>
 </template>
 
 <script>
-import { getTvShowEpisodes } from "~/api";
+import { getTvShowEpisodes, servers } from "~/api";
 import EpisodesItem from "~/components/tv/EpisodesItem";
-import Modal from "~/components/Modal";
 
 export default {
   components: {
     EpisodesItem,
-    Modal,
   },
 
   props: {
@@ -63,8 +67,7 @@ export default {
     return {
       activeSeason: this.numberOfSeasons,
       activeEpisodes: null,
-      modalVisible: false,
-      modalStartAt: 0,
+      selectedServer: 0,
     };
   },
 
@@ -76,30 +79,17 @@ export default {
     },
 
     seasons() {
-      const seasons = [];
-
-      for (let index = 0; index < this.numberOfSeasons; index++) {
-        seasons.push({
+      return [...Array(this.numberOfSeasons).keys()]
+        .map((index) => ({
           season: index + 1,
           episodes: null,
-        });
-      }
-
-      seasons.sort((a, b) => (a.season > b.season ? -1 : 1));
-
-      return seasons;
+        }))
+        .sort((a, b) => b.season - a.season);
     },
   },
 
   mounted() {
-    this.getEpisodes(); // Call the method normally
-
-    const data = async () => {
-      const result = await this.getEpisodes(); // `this` works correctly here
-      console.log("Props received:", result);
-    };
-
-    data(); // Call the async function
+    this.getEpisodes();
   },
 
   methods: {
@@ -121,15 +111,6 @@ export default {
           }
         );
       }
-    },
-    openModal(index) {
-      this.modalStartAt = index;
-      this.modalVisible = true;
-    },
-
-    closeModal() {
-      this.modalVisible = false;
-      this.modalStartAt = 0;
     },
   },
 };

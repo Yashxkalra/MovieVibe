@@ -1,55 +1,43 @@
 <template>
   <div class="spacing">
     <div :class="$style.head">
-      <pre>{{ $props }}</pre>
-
       <select
         v-if="seasons.length > 1"
         v-model="activeSeason"
-        @change="getEpisodes"
-      >
+        @change="getEpisodes">
         <option
           v-for="season in seasons"
           :key="`season-${season.season}`"
-          :value="season.season"
-        >
+          :value="season.season">
           Season {{ season.season }}
         </option>
       </select>
 
-      <strong v-if="activeEpisodes" :class="$style.count">
+      <strong
+        v-if="activeEpisodes"
+        :class="$style.count">
         {{ episodeCount }}
       </strong>
     </div>
 
-    <div v-if="activeEpisodes" :class="$style.items">
+    <div
+      v-if="activeEpisodes"
+      :class="$style.items">
       <EpisodesItem
         v-for="episode in activeEpisodes"
         :key="`episode-${episode.id}`"
-        :episode="episode"
-        @openModal="openModal"
-      />
+        :episode="episode" />
     </div>
-    <Modal
-      v-if="modalVisible"
-      :data="videos"
-      type="iframe"
-      nav
-      :start-at="modalStartAt"
-      @close="closeModal"
-    />
   </div>
 </template>
 
 <script>
-import { getTvShowEpisodes } from "~/api";
-import EpisodesItem from "~/components/tv/EpisodesItem";
-import Modal from "~/components/Modal";
+import { getTvShowEpisodes } from '~/api';
+import EpisodesItem from '~/components/tv/EpisodesItem';
 
 export default {
   components: {
     EpisodesItem,
-    Modal,
   },
 
   props: {
@@ -59,23 +47,19 @@ export default {
     },
   },
 
-  data() {
+  data () {
     return {
       activeSeason: this.numberOfSeasons,
       activeEpisodes: null,
-      modalVisible: false,
-      modalStartAt: 0,
     };
   },
 
   computed: {
-    episodeCount() {
-      return `${this.activeEpisodes.length} ${
-        this.activeEpisodes.length > 1 ? "Episodes" : "Episode"
-      }`;
+    episodeCount () {
+      return `${this.activeEpisodes.length} ${this.activeEpisodes.length > 1 ? 'Episodes' : 'Episode'}`;
     },
 
-    seasons() {
+    seasons () {
       const seasons = [];
 
       for (let index = 0; index < this.numberOfSeasons; index++) {
@@ -85,28 +69,19 @@ export default {
         });
       }
 
-      seasons.sort((a, b) => (a.season > b.season ? -1 : 1));
+      seasons.sort((a, b) => a.season > b.season ? -1 : 1);
 
       return seasons;
     },
   },
 
-  mounted() {
-    this.getEpisodes(); // Call the method normally
-
-    const data = async () => {
-      const result = await this.getEpisodes(); // `this` works correctly here
-      console.log("Props received:", result);
-    };
-
-    data(); // Call the async function
+  mounted () {
+    this.getEpisodes();
   },
 
   methods: {
-    getEpisodes() {
-      const season = this.seasons.find(
-        (season) => season.season === this.activeSeason
-      );
+    getEpisodes () {
+      const season = this.seasons.find(season => season.season === this.activeSeason);
 
       // if we already have the episodes, just show them
       // else do api call
@@ -114,29 +89,18 @@ export default {
         this.activeEpisodes = season.episodes;
       } else {
         // get episodes for a certain season
-        getTvShowEpisodes(this.$route.params.id, this.activeSeason).then(
-          (response) => {
-            season.episodes = response.episodes;
-            this.activeEpisodes = season.episodes;
-          }
-        );
+        getTvShowEpisodes(this.$route.params.id, this.activeSeason).then((response) => {
+          season.episodes = response.episodes;
+          this.activeEpisodes = season.episodes;
+        });
       }
-    },
-    openModal(index) {
-      this.modalStartAt = index;
-      this.modalVisible = true;
-    },
-
-    closeModal() {
-      this.modalVisible = false;
-      this.modalStartAt = 0;
     },
   },
 };
 </script>
 
 <style lang="scss" module>
-@import "~/assets/css/utilities/_variables.scss";
+@import '~/assets/css/utilities/_variables.scss';
 
 .head {
   display: flex;

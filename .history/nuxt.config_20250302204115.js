@@ -73,16 +73,6 @@ export default {
     // https://go.nuxtjs.dev/eslint
     "@nuxtjs/eslint-module",
   ],
-  configureWebpack: {
-    resolve: {
-      alias: {
-        "@": require("path").resolve(__dirname, "src"),
-      },
-    },
-  },
-  alias: {
-    "@": "/absolute/path/to/src",
-  },
   build: {
     webpack5: true,
     hotMiddleware: {

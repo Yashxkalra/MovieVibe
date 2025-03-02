@@ -249,9 +249,11 @@ export function getMovies(query, page = 1) {
       })
       .then((response) => {
         resolve(response.data);
+        // console.log(response.data);
       })
       .catch((error) => {
         reject(error);
+        // console.log(error);
       });
   });
 }
@@ -543,137 +545,4 @@ export function getYouTubeVideo(id) {
         reject(error);
       });
   });
-}
-
-const servers = [
-  {
-    name: "vidsrc",
-    url: "https://vidsrc.me",
-  },
-  {
-    name: "multiembed",
-    movieUrl: (id) => `https://multiembed.mov/directstream.php?video_id=${id}`,
-    tvUrl: (id, season, episode) =>
-      `https://multiembed.mov/directstream.php?video_id=${id}&s=${season}&e=${
-        episode || 1
-      }`,
-  },
-  {
-    name: "2embed",
-    movieUrl: (id) => `https://www.2embed.cc/embed/${id}`,
-    tvUrl: (id, season, episode) =>
-      `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode || 1}`,
-  },
-];
-
-// Generate movie servers dynamically
-const moviesServers = servers.map((server) => ({
-  getUrl: (id) =>
-    server.movieUrl ? server.movieUrl(id) : `${server.url}/embed/movie/${id}`,
-}));
-
-// Generate TV servers dynamically
-const tvServers = servers.map((server) => ({
-  getUrl: (id, season, episode) =>
-    server.tvUrl
-      ? server.tvUrl(id, season, episode)
-      : `${server.url}/embed/tv/${id}/${season}/${episode || 1}`,
-}));
-
-export function useMovieLink() {
-  const movieLink = ref(null);
-
-  async function fetchMovieLink(id, selectedServer) {
-    if (!id) {
-      console.error("Movie ID is required");
-      return null;
-    }
-
-    // Ensure servers and moviesServers are defined
-    if (!Array.isArray(servers) || !Array.isArray(moviesServers)) {
-      console.error("Server data is not properly initialized");
-      return null;
-    }
-
-    // Check if selectedServer is a valid index
-    if (selectedServer < 0 || selectedServer >= servers.length) {
-      console.error("Invalid selectedServer index:", selectedServer);
-      return null;
-    }
-
-    const serverUrl = servers[selectedServer];
-    const movieUrl = moviesServers[selectedServer]?.getUrl(id);
-
-    if (!serverUrl || !movieUrl) {
-      console.error("Server URL or movie URL is missing");
-      return null;
-    }
-
-    try {
-      const response = await fetch(movieUrl);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      movieLink.value = data;
-
-      return data;
-    } catch (error) {
-      console.error("Error fetching movie link:", error);
-      return null;
-    }
-  }
-
-  return { movieLink, fetchMovieLink };
-}
-
-export function useEpisodeLink() {
-  const episodesLink = ref(null);
-
-  async function fetchEpisodesLink(item, id, season, selectedServer) {
-    if (!item || !id || season == null || selectedServer == null) {
-      console.error("Missing required parameters");
-      return null;
-    }
-
-    if (!Array.isArray(tvServers) || !tvServers[selectedServer]) {
-      console.error("Invalid server index or tvServers is not initialized");
-      return null;
-    }
-
-    try {
-      const selectedSeason = parseInt(season) + 1;
-
-      const tvUrl = tvServers[selectedServer].getUrl(
-        id,
-        selectedSeason,
-        item.episode_number
-      );
-
-      if (!tvUrl) {
-        console.error("Invalid TV URL generated");
-        return null;
-      }
-
-      console.log("Fetching episode from URL:", tvUrl);
-
-      const response = await fetch(tvUrl);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      episodesLink.value = data;
-
-      return data;
-    } catch (error) {
-      console.error("Error fetching episode link:", error);
-      return null;
-    }
-  }
-
-  return { episodesLink, fetchEpisodesLink };
 }

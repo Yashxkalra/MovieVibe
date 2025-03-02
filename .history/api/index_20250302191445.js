@@ -545,40 +545,40 @@ export function getYouTubeVideo(id) {
   });
 }
 
-const servers = [
-  {
-    name: "vidsrc",
-    url: "https://vidsrc.me",
-  },
-  {
-    name: "multiembed",
-    movieUrl: (id) => `https://multiembed.mov/directstream.php?video_id=${id}`,
-    tvUrl: (id, season, episode) =>
-      `https://multiembed.mov/directstream.php?video_id=${id}&s=${season}&e=${
-        episode || 1
-      }`,
-  },
-  {
-    name: "2embed",
-    movieUrl: (id) => `https://www.2embed.cc/embed/${id}`,
-    tvUrl: (id, season, episode) =>
-      `https://www.2embed.cc/embedtv/${id}&s=${season}&e=${episode || 1}`,
-  },
-];
+const moviesServers = servers.map((server) => {
+  if (server.name === "multiembed") {
+    return {
+      getUrl: (id) => server.movieUrl(id),
+    };
+  } else if (server.name === "2embed") {
+    return {
+      getUrl: (id) => server.movieUrl(id),
+    };
+  } else {
+    return {
+      getUrl: (id) => `${server.url}/embed/movie/${id}`,
+    };
+  }
+});
 
-// Generate movie servers dynamically
-const moviesServers = servers.map((server) => ({
-  getUrl: (id) =>
-    server.movieUrl ? server.movieUrl(id) : `${server.url}/embed/movie/${id}`,
-}));
-
-// Generate TV servers dynamically
-const tvServers = servers.map((server) => ({
-  getUrl: (id, season, episode) =>
-    server.tvUrl
-      ? server.tvUrl(id, season, episode)
-      : `${server.url}/embed/tv/${id}/${season}/${episode || 1}`,
-}));
+const tvServers = servers.map((server) => {
+  if (server.name === "multiembed") {
+    return {
+      getUrl: (id, selected, episodeNumber) =>
+        server.tvUrl(id, selected, episodeNumber),
+    };
+  } else if (server.name === "2embed") {
+    return {
+      getUrl: (id, selected, episodeNumber) =>
+        server.tvUrl(id, selected, episodeNumber),
+    };
+  } else {
+    return {
+      getUrl: (id, selected, episodeNumber) =>
+        `${server.url}/embed/tv/${id}/${selected}/${episodeNumber || 1}`,
+    };
+  }
+});
 
 export function useMovieLink() {
   const movieLink = ref(null);
@@ -677,3 +677,23 @@ export function useEpisodeLink() {
 
   return { episodesLink, fetchEpisodesLink };
 }
+
+const servers = [
+  { name: "vidsrc", url: "https://vidsrc.me" },
+  {
+    name: "multiembed",
+    movieUrl: (id) => `https://multiembed.mov/directstream.php?video_id=${id}`,
+    tvUrl: (id, selected, episodeNumber) =>
+      `https://multiembed.mov/directstream.php?video_id=${id}&s=${selected}&e=${
+        episodeNumber || 1
+      }`,
+  },
+  {
+    name: "2embed",
+    movieUrl: (id) => `https://www.2embed.cc/embed/${id}`,
+    tvUrl: (id, selected, episodeNumber) =>
+      `https://www.2embed.cc/embedtv/${id}&s=${selected}&e=${
+        episodeNumber || 1
+      }`,
+  },
+];

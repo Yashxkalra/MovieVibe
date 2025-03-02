@@ -27,7 +27,7 @@ export default {
     };
   },
   mounted() {
-    console.log("Props received:", menu);
+    console.log("Props received:", result);
   },
   methods: {
     clicked(index, item) {

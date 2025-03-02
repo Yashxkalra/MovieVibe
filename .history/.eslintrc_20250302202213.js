@@ -23,6 +23,6 @@ module.exports = {
     "comma-dangle": ["warn", "always-multiline"], // Changed from "error" to "warn"
     semi: ["warn", "always"], // Changed from "error" to "warn"
     "space-before-function-paren": "off",
-    "no-console": ["off"], // Console warnings instead of errors
+    "no-console": ["warn"], // Console warnings instead of errors
   },
 };

@@ -545,7 +545,7 @@ export function getYouTubeVideo(id) {
   });
 }
 
-const servers = [
+export const servers = [
   {
     name: "vidsrc",
     url: "https://vidsrc.me",

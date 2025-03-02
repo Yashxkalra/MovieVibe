@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.item">
-    <a :class="$style.link" href="#">
+    <a :class="$style.link">
       <div :class="$style.image">
         <img
           v-if="poster"

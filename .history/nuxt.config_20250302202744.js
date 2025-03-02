@@ -54,6 +54,9 @@ export default {
       },
     ],
   },
+  client: {
+    overlay: false, // Disable error overlay
+  },
 
   // Global CSS
   css: ["@/assets/css/global.scss"],
@@ -73,24 +76,8 @@ export default {
     // https://go.nuxtjs.dev/eslint
     "@nuxtjs/eslint-module",
   ],
-  configureWebpack: {
-    resolve: {
-      alias: {
-        "@": require("path").resolve(__dirname, "src"),
-      },
-    },
-  },
-  alias: {
-    "@": "/absolute/path/to/src",
-  },
   build: {
     webpack5: true,
-    hotMiddleware: {
-      client: {
-        // turn off client overlay when errors are present
-        overlay: false,
-      },
-    },
   },
   modules: ["@nuxtjs/dotenv", "@nuxtjs/axios", "@nuxtjs/pwa"],
 

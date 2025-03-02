@@ -26,9 +26,7 @@ export default {
       active: 0,
     };
   },
-  mounted() {
-    console.log("Props received:", menu);
-  },
+  mounted() {},
   methods: {
     clicked(index, item) {
       this.active = index;

@@ -1,8 +1,6 @@
 <template>
   <div class="spacing">
     <div :class="$style.head">
-      <pre>{{ $props }}</pre>
-
       <select
         v-if="seasons.length > 1"
         v-model="activeSeason"
@@ -17,6 +15,16 @@
         </option>
       </select>
 
+      <select v-model="selectedServer" class="server-select">
+        <option
+          v-for="(server, index) in servers"
+          :key="server.name"
+          :value="index"
+        >
+          {{ `Server ${index + 1}` }}
+        </option>
+      </select>
+
       <strong v-if="activeEpisodes" :class="$style.count">
         {{ episodeCount }}
       </strong>
@@ -27,29 +35,18 @@
         v-for="episode in activeEpisodes"
         :key="`episode-${episode.id}`"
         :episode="episode"
-        @openModal="openModal"
       />
     </div>
-    <Modal
-      v-if="modalVisible"
-      :data="videos"
-      type="iframe"
-      nav
-      :start-at="modalStartAt"
-      @close="closeModal"
-    />
   </div>
 </template>
 
 <script>
 import { getTvShowEpisodes } from "~/api";
 import EpisodesItem from "~/components/tv/EpisodesItem";
-import Modal from "~/components/Modal";
 
 export default {
   components: {
     EpisodesItem,
-    Modal,
   },
 
   props: {
@@ -63,43 +60,29 @@ export default {
     return {
       activeSeason: this.numberOfSeasons,
       activeEpisodes: null,
-      modalVisible: false,
-      modalStartAt: 0,
+      selectedServer: 0, // Ensure reactivity
+      servers, // Assign imported servers
     };
   },
 
   computed: {
     episodeCount() {
-      return `${this.activeEpisodes.length} ${
-        this.activeEpisodes.length > 1 ? "Episodes" : "Episode"
-      }`;
+      const count = this.activeEpisodes?.length || 0;
+      return `${count} ${count > 1 ? "Episodes" : "Episode"}`;
     },
 
     seasons() {
-      const seasons = [];
-
-      for (let index = 0; index < this.numberOfSeasons; index++) {
-        seasons.push({
+      return [...Array(this.numberOfSeasons).keys()]
+        .map((index) => ({
           season: index + 1,
           episodes: null,
-        });
-      }
-
-      seasons.sort((a, b) => (a.season > b.season ? -1 : 1));
-
-      return seasons;
+        }))
+        .sort((a, b) => b.season - a.season); // Descending order
     },
   },
 
   mounted() {
-    this.getEpisodes(); // Call the method normally
-
-    const data = async () => {
-      const result = await this.getEpisodes(); // `this` works correctly here
-      console.log("Props received:", result);
-    };
-
-    data(); // Call the async function
+    this.getEpisodes();
   },
 
   methods: {
@@ -108,28 +91,19 @@ export default {
         (season) => season.season === this.activeSeason
       );
 
-      // if we already have the episodes, just show them
-      // else do api call
       if (season.episodes) {
         this.activeEpisodes = season.episodes;
       } else {
-        // get episodes for a certain season
-        getTvShowEpisodes(this.$route.params.id, this.activeSeason).then(
-          (response) => {
+        getTvShowEpisodes(this.$route.params.id, this.activeSeason)
+          .then((response) => {
             season.episodes = response.episodes;
             this.activeEpisodes = season.episodes;
-          }
-        );
+          })
+          .catch((error) => {
+            console.error("Failed to fetch episodes:", error);
+            this.activeEpisodes = [];
+          });
       }
-    },
-    openModal(index) {
-      this.modalStartAt = index;
-      this.modalVisible = true;
-    },
-
-    closeModal() {
-      this.modalVisible = false;
-      this.modalStartAt = 0;
     },
   },
 };
@@ -167,5 +141,14 @@ export default {
   flex-wrap: wrap;
   margin-right: -0.4rem;
   margin-left: -0.4rem;
+}
+
+.server-select {
+  border: 0;
+  background: inherit;
+  font-size: large;
+  opacity: 0.5;
+  margin-bottom: 6px;
+  cursor: pointer;
 }
 </style>
